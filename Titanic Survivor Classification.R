@@ -2,10 +2,10 @@
 train <- read.csv("d:/train.csv")
   
 # Import the testing set: test
-test_url <- "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv"
 test <- read.csv("d:/test.csv")
 str(test)
 Summary(test)
+
 # Survival rates in absolute numbers
 table(train$Survived)
 
@@ -32,6 +32,7 @@ test_one <- test
 # Initialize a Survived column to 0
 test_one$Survived <- 0
 
+#Creating baseline model
 # Set Survived to 1 if Sex equals "female"
 test_one$Survived[test$Sex == "female"] <- 1
 
@@ -56,7 +57,7 @@ write.csv(my_solution, file = "my_solution.csv", row.names = FALSE)
 
 #Using Complexity parameter
 my_tree_three <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked, 
-                       data = train, method = "class", control = rpart.control(minsplit = 50, cp = 0))
+ data = train, method = "class", control = rpart.control(minsplit = 50, cp = 0))
 plot(my_tree_three)
 
 # Create train_two
@@ -65,13 +66,13 @@ train_two$family_size <- train$SibSp + train$Parch + 1
 
 # Finish the command
 my_tree_four <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + family_size, 
-                      data = train_two, method = "class")
+data = train_two, method = "class")
 
 # Visualize new decision tree
 Plot(my_tree_four)
 # Finish the command
 my_tree_five <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title, 
-                      data = train_new, method = "class")
+data = train_new, method = "class")
 
 # Visualize my_tree_five
 Plot(my_tree_five)
@@ -96,12 +97,12 @@ all_data$Embarked <- factor(all_data$Embarked)
 # Passenger on row 1044 has an NA Fare value. Let's replace it with the median fare value.
 all_data$Fare[1044] <- median(all_data$Fare, na.rm = TRUE)
 
-# How to fill in missing Age values?
+# Fill in missing Age values?
 # We make a prediction of a passengers Age using the other variables and a decision tree model. 
-# This time you give method = "anova" since you are predicting a continuous variable.
+# Method = "anova" since you are predicting a continuous variable.
 library(rpart)
 predicted_age <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked + Title + family_size,
-                       data = all_data[!is.na(all_data$Age),], method = "anova")
+data = all_data[!is.na(all_data$Age),], method = "anova")
 all_data$Age[is.na(all_data$Age)] <- predict(predicted_age, all_data[is.na(all_data$Age),])
 
 # Split the data back into a train set and a test set
@@ -120,7 +121,7 @@ set.seed(111)
 
 # Apply the Random Forest Algorithm
 my_forest <- randomForest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title, 
-                          data = train, importance = TRUE, ntree = 1000)
+data = train, importance = TRUE, ntree = 1000)
 
 # Make your prediction using the test set
 my_prediction <- predict(my_forest, test)
